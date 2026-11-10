@@ -129,8 +129,11 @@ dd .ed{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:3px;ba
         </fieldset>
         <fieldset>
           <legend>Setting</legend>
-          <div class="field"><span class="lbl">Cathedral arches</span>
+          <div class="field"><span class="lbl">Cathedral</span>
             <div class="seg" data-key="cathedral" role="group" aria-label="Cathedral"><button type="button" data-val="full">Full cathedral</button><button type="button" data-val="none">None</button></div></div>
+          <div class="field"><span class="lbl">Peekaboo side stones</span>
+            <div class="seg" data-key="peek" role="group" aria-label="Peekaboo side stones"><button type="button" data-val="on">On</button><button type="button" data-val="off">Off</button></div>
+            <span class="note" id="peek-note" hidden>A 6-claw setting puts prongs where these stones go, so they are left off.</span></div>
           <div class="field"><span class="lbl">Hidden halo</span>
             <div class="seg" data-key="halo" role="group" aria-label="Hidden halo"><button type="button" data-val="off">Off</button><button type="button" data-val="half">Half</button><button type="button" data-val="full">Full</button></div></div>
           <div class="field" id="perend-f"><div class="top"><label for="perend">Halo stones, front and back</label><output id="perend-o" for="perend"></output></div>
@@ -192,7 +195,7 @@ renderer.toneMappingExposure=1.05;
 const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(30,1,0.5,600);
 
 /* ---------- design state ---------- */
-const ORDER={shape:'oval',carat:1.8,ratio:1.45,stone:'diamond',prongs:'4',cathedral:'full',halo:'half',perEnd:2,
+const ORDER={shape:'oval',carat:1.8,ratio:1.45,stone:'diamond',prongs:'4',cathedral:'full',peek:'on',halo:'half',perEnd:2,
   metal:'yellow',size:4.75,width:2.0,bandStones:10,sideStone:'match',engrave:'A',font:'serif'};
 const KEY='ring-design-v1';
 let state={...ORDER};
@@ -262,7 +265,7 @@ const gemFS=`uniform samplerCube uEnv; uniform vec3 uTint; uniform float uFire; 
     #include <encodings_fragment>
   }`;
 const gemMat=()=>new THREE.ShaderMaterial({uniforms:{uEnv:{value:cubeRT.texture},uTint:{value:new THREE.Color(1,1,1)},uFire:{value:1}},extensions:{derivatives:true},vertexShader:gemVS,fragmentShader:gemFS});
-const centerMat=gemMat(), sideMat=gemMat();
+const centerMat=gemMat(), sideMat=gemMat(), peekMat=gemMat();
 function setGem(m,key){ const s=STONES[key]; m.uniforms.uTint.value.setRGB(s.t[0],s.t[1],s.t[2]); m.uniforms.uFire.value=s.fire; }
 
 /* ---------- geometry helpers ---------- */
@@ -319,13 +322,25 @@ function build(){
 
   const m=METALS[s.metal]; metal.color.setRGB(m.c[0],m.c[1],m.c[2]); metal.roughness=m.r;
   engrMat.color.setRGB(m.c[0]*0.22,m.c[1]*0.22,m.c[2]*0.22);
-  setGem(centerMat,s.stone); setGem(sideMat,s.sideStone==='match'?s.stone:'diamond');
+  setGem(centerMat,s.stone); setGem(sideMat,s.sideStone==='match'?s.stone:'diamond'); setGem(peekMat,s.sideStone==='match'?s.stone:'diamond');
+  peekMat.uniforms.uTint.value.multiplyScalar(2.4);  // side-facing stone catches less of the overhead light
   const add=(g,mat)=>{ const o=new THREE.Mesh(g,mat); ring.add(o); return o; };
   const gem=(geo,mat,pos,dir,sx,sy,sz)=>{ const o=add(geo,mat); o.position.copy(pos); o.quaternion.setFromUnitVectors(UP,dir.clone().normalize()); o.scale.set(sx,sy??sx,sz??sx); return o; };
 
-  // shank
-  add(sweep(360,32,true,(i,j)=>{ const th=2*Math.PI*i/360,[dr,dz]=supe(2*Math.PI*j/32,T/2,BW/2,0.38),r=RC+dr;
-    return {p:[r*Math.cos(th),r*Math.sin(th),dz],c:[RC*Math.cos(th),RC*Math.sin(th),0]}; }),metal);
+  // shank: one continuous band. With the cathedral, the outer edge of each shoulder sweeps up
+  // and meets the head just under the halo rail, so the pave can run up into the setting.
+  const cath=s.cathedral==='full';
+  const Ex=HK*A*0.92, Ey=HY-0.15, RE=Math.hypot(Ex,Ey), phiE=Math.atan2(Ex,Ey);
+  const phi0=Math.min(Math.PI*0.45,phiE+0.62), dphi=0.1;
+  const Rout=phi=>{ phi=Math.abs(phi); if(!cath||phi>=phi0||phi<=phiE-dphi) return RO;
+    if(phi>=phiE) return RO+(RE-RO)*Math.pow((phi0-phi)/(phi0-phiE),2.7);
+    const t=(phi-(phiE-dphi))/dphi; return RO+(RE-RO)*t*t*(3-2*t); };
+  const cr=Math.min(0.5,T*0.3,BW*0.3);
+  const rr=(j,M,r0,r1,w)=>{ const C=M/4,k=Math.floor(j/C),q=(j%C)/(C-1),ang=(k+q)*Math.PI/2;
+    const cx=(k===0||k===3)?r1-cr:r0+cr, cz=k<2?w/2-cr:-w/2+cr; return [cx+cr*Math.cos(ang),cz+cr*Math.sin(ang)]; };
+  const SN=900;
+  add(sweep(SN,32,true,(i,j)=>{ const th=2*Math.PI*i/SN, phi=Math.atan2(Math.cos(th),Math.sin(th)), r1=Rout(phi), [r,z]=rr(j,32,RIN,r1,BW), rc=(RIN+r1)/2;
+    return {p:[r*Math.cos(th),r*Math.sin(th),z],c:[rc*Math.cos(th),rc*Math.sin(th),0]}; }),metal);
 
   // shaped rail point + outward normal
   const railPt=(k,a,y)=>{ const f=sf(a); return new V3(k*A*Math.cos(a)*f,y,k*B*Math.sin(a)*f); };
@@ -347,16 +362,21 @@ function build(){
     add(new THREE.TubeGeometry(cv,48,pr,14,false),metal);
     const tip=add(tipGeo,metal); tip.position.copy(P(0.94,tipY)); prongMid.push(P(0.9,HY)); });
 
-  // cathedral arches
-  const AT=1.2, AW=BW*0.9; let arches=[];
-  if(s.cathedral==='full'){
-    const a0=48*Math.PI/180, P0=new V3(RC*Math.sin(a0),RC*Math.cos(a0),0), E=new V3(HK*A-0.15,HY-0.1,0), dx=P0.x-E.x, dy=E.y-P0.y;
-    arches=[1,-1].map(sg=>{ const f=v=>new V3(v.x*sg,v.y,0);
-      return new THREE.CubicBezierCurve3(f(P0),f(new V3(P0.x-0.05*dx,P0.y+0.45*dy,0)),f(new V3(E.x+0.45*dx,E.y-0.1*dy,0)),f(E)); });
-    arches.forEach(cv=>add(sweep(80,24,false,(i,j)=>{ const {c,n:nn}=frame(cv,i/80),[du,dz]=supe(2*Math.PI*j/24,AT/2,AW/2,0.45);
-      return {p:[c.x+nn.x*du,c.y+nn.y*du,dz],c:[c.x,c.y,0]}; }),metal));
+  // peekaboo side stones: a small diamond on each end of the basket, below the halo
+  dims.peek=false;
+  if(s.peek==='on' && s.prongs!=='6'){
+    dims.peek=true;
+    const barGeo=new THREE.CylinderGeometry(0.26,0.26,1,12);
+    for(const sg of [1,-1]){
+      const a=sg>0?Math.PI/2:3*Math.PI/2, lo=railPt(LK,a,LY), hi=railPt(HK,a,HY);
+      const d=hi.clone().sub(lo), mid=lo.clone().add(hi).multiplyScalar(0.5);
+      const n=new V3(0,-d.z,d.y).normalize(); if(n.z*sg<0) n.negate();
+      const bar=add(barGeo,metal); bar.position.copy(mid); bar.quaternion.setFromUnitVectors(UP,d.clone().normalize()); bar.scale.set(1,d.length(),1);
+      const pd=Math.min(1.3,d.length()*0.42);
+      const bez=add(new THREE.CylinderGeometry(pd/2+0.22,pd/2+0.22,0.5,28),metal); bez.position.copy(mid); bez.quaternion.setFromUnitVectors(UP,n);
+      gem(roundGeo,peekMat,mid.clone().add(n.clone().multiplyScalar(0.3)),n,pd/2);
+    }
   }
-  function frame(cv,u){ const c=cv.getPointAt(u),t=cv.getTangentAt(u); const nn=new V3(t.y,-t.x,0).normalize(); if(nn.dot(c)<0) nn.negate(); return {c,n:nn}; }
 
   // hidden halo stones
   if(s.halo!=='off'){
@@ -379,16 +399,12 @@ function build(){
   let placed=0;
   if(s.bandStones>0){
     const dia=Math.min(1.6,Math.max(0.9,BW*0.62)), pitch=dia*1.18, bz=Math.min(dia*0.51,BW/2-0.24);
-    const pts=[],nrm=[]; let a0;
-    if(arches.length){
-      for(let u=0.93;u>=0;u-=0.01){ const {c,n:nn}=frame(arches[0],u),p=c.clone().add(nn.clone().multiplyScalar(AT/2));
-        if(Math.hypot(p.x,p.y)<RO+0.03){ a0=Math.atan2(p.x,p.y); break; } pts.push(p); nrm.push(nn); }
-      if(a0===undefined) a0=0.9;
-    } else a0=Math.asin(Math.min(0.95,(LK*A+0.45+pr)/RO));
-    for(let a=a0;a<=Math.PI-0.06;a+=0.01){ pts.push(new V3(RO*Math.sin(a),RO*Math.cos(a),0)); nrm.push(new V3(Math.sin(a),Math.cos(a),0)); }
+    const a0=cath?phiE+0.03:Math.asin(Math.min(0.95,(LK*A+0.45+pr)/RO)), pts=[];
+    for(let a=a0;a<=Math.PI-0.06;a+=0.004){ const r=Rout(a); pts.push(new V3(r*Math.sin(a),r*Math.cos(a),0)); }
+    const nrm=pts.map((p,i)=>{ const t=pts[Math.min(pts.length-1,i+1)].clone().sub(pts[Math.max(0,i-1)]); const nn=new V3(t.y,-t.x,0).normalize(); if(nn.dot(p)<0) nn.negate(); return nn; });
     const L=[0]; for(let i=1;i<pts.length;i++) L.push(L[i-1]+pts[i].distanceTo(pts[i-1]));
     const at=sx=>{ let i=1; while(i<L.length-1&&L[i]<sx) i++; const f=(sx-L[i-1])/(L[i]-L[i-1]); return {p:pts[i-1].clone().lerp(pts[i],f),n:nrm[i-1].clone().lerp(nrm[i],f).normalize()}; };
-    const s0=arches.length?dia*0.76:dia*0.6+0.1, total=L[L.length-1];
+    const s0=cath?dia*0.8:dia*0.6+0.1, total=L[L.length-1];
     placed=Math.max(0,Math.min(s.bandStones,Math.floor((total-s0-dia*0.6)/pitch)+1));
     const beadGeo=new THREE.SphereGeometry(Math.max(0.15,dia*0.155),12,10);
     for(const sg of [1,-1]){
@@ -482,6 +498,7 @@ function refresh(){
   $('dims-note').textContent='About '+dims.L.toFixed(1)+' × '+dims.W.toFixed(1)+' mm';
   $('ratio-f').hidden=s.shape==='round'; $('perend-f').hidden=s.halo!=='half';
   $('sidestone-f').hidden=s.stone==='diamond';
+  $('peek-note').hidden=!(s.peek==='on'&&s.prongs==='6');
   const fit=$('fit-note'); fit.hidden=!(s.bandStones>dims.placed); fit.textContent='Only '+dims.placed+' fit at this band width and size.';
   $('scale-tag').textContent='US '+frac(s.size)+' · '+ID.toFixed(1)+' mm ID';
   const shapeCap=SHAPES[s.shape].name;
@@ -496,7 +513,7 @@ function specRows(){ const s=state,o=ORDER;
   return [
     ['Size',frac(s.size),'≈ '+(11.63+0.8128*s.size).toFixed(1)+' mm inside diameter',s.size!==o.size],
     ['Band',s.width.toFixed(1).replace('.0','')+' mm '+METALS[s.metal].name,'',s.width!==o.width||s.metal!==o.metal],
-    ['Setting',s.cathedral==='full'?'Full cathedral':'No cathedral',s.prongs+' claw prongs',s.cathedral!==o.cathedral],
+    ['Setting',s.cathedral==='full'?'Full cathedral':'No cathedral',s.prongs+' claw prongs'+(dims.peek?', peekaboo side stones':''),s.cathedral!==o.cathedral||s.peek!==o.peek],
     ['Center',(+s.carat.toFixed(2))+' ct '+SHAPES[s.shape].name+' '+STONES[s.stone].name,'≈ '+dims.L.toFixed(1)+' × '+dims.W.toFixed(1)+' mm',s.carat!==o.carat||s.shape!==o.shape||s.stone!==o.stone],
     ['Halo',haloTxt(s),s.halo==='half'?s.perEnd+' stone'+(s.perEnd>1?'s':'')+' front, '+s.perEnd+' back':'',s.halo!==o.halo||(s.halo==='half'&&s.perEnd!==o.perEnd)],
     ['Band',dims.placed+' stones each side',sideNote,dims.placed!==o.bandStones||(s.stone!=='diamond'&&s.sideStone!=='match')],
@@ -508,6 +525,7 @@ function specText(){ const s=state, L=[];
   if(s.halo==='half') L.push('half hidden halo, '+s.perEnd+' stone'+(s.perEnd>1?'s':'')+' front and back'); else if(s.halo==='full') L.push('full hidden halo');
   L.push(SHAPES[s.shape].name+' '+(+s.carat.toFixed(2))+' ct '+STONES[s.stone].name+' (~'+dims.L.toFixed(1)+' x '+dims.W.toFixed(1)+' mm'+(s.shape!=='round'?', '+s.ratio.toFixed(2)+' L:W':'')+')');
   L.push(s.prongs+' claw prongs');
+  if(dims.peek) L.push('peekaboo side stones');
   if(dims.placed) L.push(dims.placed+' stones on the band, each side'+(s.stone!=='diamond'?(s.sideStone==='match'?' ('+STONES[s.stone].name+')':' (diamond)'):''));
   if(s.engrave.trim()) L.push('', 'Engrave "'+s.engrave.trim()+'" ('+{serif:'serif italic',script:'script',block:'block'}[s.font]+')');
   return L.join('\n'); }
