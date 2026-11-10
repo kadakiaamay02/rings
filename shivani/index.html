@@ -1,0 +1,530 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Oval Cathedral Ring</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500;1,6..96,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Pinyon+Script&display=swap">
+<style>
+/* Layout: sticky turntable stage on the left, bench controls and the job ticket on the right; on phones the stage pins to the top while controls scroll under it. */
+:root{
+  --bg:#e8eced; --surface:#f7f9f9; --ink:#162024; --muted:#55646a; --line:#c6d0d3;
+  --gold:#8a5e10; --gold-soft:#efe2c3;
+  --stage-top:#3b4549; --stage-bot:#0f1416; --stage-ink:#e6edef;
+  --f-display:"Bodoni Moda", Didot, "Bodoni 72", Georgia, serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0c1012; --surface:#141a1d; --ink:#e3e9eb; --muted:#93a1a7; --line:#263034;
+  --gold:#e0b45c; --gold-soft:#2b2415; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0c1012; --surface:#141a1d; --ink:#e3e9eb; --muted:#93a1a7; --line:#263034;
+  --gold:#e0b45c; --gold-soft:#2b2415; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1220px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:500;font-size:clamp(28px,4.4vw,46px);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1 em{font-style:italic;color:var(--gold)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:24px;align-items:start}
+.viewer{display:flex;flex-direction:column;gap:12px;min-width:0;position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px)}
+.stage{position:relative;height:min(74vh,700px);min-height:340px;border-radius:6px;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 25%, var(--stage-top), var(--stage-bot) 70%)}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.stage .hint,.stage .scale{position:absolute;bottom:12px;font-family:var(--f-mono);font-size:11.5px;color:var(--stage-ink);opacity:.62;pointer-events:none}
+.stage .hint{left:14px}.stage .scale{right:14px}
+.stage .err{position:absolute;inset:0;display:grid;place-items:center;color:var(--stage-ink);padding:24px;text-align:center}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar .spacer{flex:1}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+button{font:500 13px/1 var(--f-body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 13px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--gold)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--gold-soft);border-color:var(--gold)}
+.side{display:flex;flex-direction:column;gap:18px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 18px 18px}
+fieldset{border:0;margin:0;padding:14px 0 4px;display:flex;flex-direction:column;gap:14px}
+fieldset+fieldset{border-top:1px solid var(--line)}
+legend{float:left;width:100%;padding:0;font:600 12px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+legend+*{clear:both}
+.field{display:flex;flex-direction:column;gap:7px}
+.field .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.field label,.field .lbl{font-size:13.5px;font-weight:500}
+.field output{font-family:var(--f-mono);font-size:13px;color:var(--gold);font-variant-numeric:tabular-nums}
+.field .note{font-size:12.5px;color:var(--muted)}
+.field .seg button{padding:8px 11px;font-size:12.5px}
+input[type=range]{width:100%;accent-color:var(--gold);margin:0}
+input[type=text],select{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px;width:100%}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px;border:1px solid var(--line)}
+.ticket{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:20px 18px 18px;font-family:var(--f-mono);font-size:13px;min-width:0}
+.ticket h2{font:500 15px/1 var(--f-mono);text-align:center;letter-spacing:.2em;margin:0 0 12px}
+.rule{border:0;border-top:2px dashed var(--line);margin:12px 0}
+dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 14px}
+dt{color:var(--muted);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+dd{margin:0;overflow-wrap:anywhere}
+dd .sub{display:block;color:var(--muted);font-size:12px}
+dd .ed{display:inline-block;margin-left:8px;padding:1px 6px;border-radius:3px;background:var(--gold-soft);color:var(--gold);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;vertical-align:1px}
+.ticket .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ticket .status{font-family:var(--f-body);font-size:12.5px;color:var(--muted);min-height:1.2em;margin-top:8px}
+.fine{font-size:12.5px;color:var(--muted);max-width:62ch}
+@media (max-width:880px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .viewer{top:env(safe-area-inset-top, 0px);z-index:5;background:var(--bg);padding-bottom:8px;margin-inline:-4px;padding-inline:4px}
+  .stage{height:44vh;min-height:260px}
+  .toolbar{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  .toolbar .seg{flex-wrap:nowrap}
+  .stage .hint{display:none}
+}
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Custom order render</div>
+    <h1 id="headline">Oval cathedral, <em>1.8 ct</em></h1>
+  </header>
+
+  <div class="layout">
+    <section class="viewer" aria-label="3D ring viewer">
+      <div class="stage" id="stage">
+        <canvas id="c" aria-label="Interactive 3D model of the ring. Drag to rotate."></canvas>
+        <div class="hint">Drag to turn · scroll or pinch to zoom</div>
+        <div class="scale" id="scale-tag">US 4¾ · 15.5 mm ID</div>
+      </div>
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Camera views">
+          <button data-view="three" aria-pressed="true">Three-quarter</button>
+          <button data-view="top" aria-pressed="false">On the hand</button>
+          <button data-view="end" aria-pressed="false">Profile</button>
+          <button data-view="side" aria-pressed="false">Side</button>
+          <button data-view="engr" aria-pressed="false">Engraving</button>
+        </div>
+        <span class="spacer"></span>
+        <button id="spin" aria-pressed="true">Turntable</button>
+      </div>
+    </section>
+
+    <div class="side">
+      <form class="panel" id="controls" aria-label="Customize the ring" onsubmit="return false">
+        <fieldset>
+          <legend>Center stone</legend>
+          <div class="field"><span class="lbl">Shape</span>
+            <div class="seg" data-key="shape" role="group" aria-label="Shape">
+              <button type="button" data-val="round">Round</button><button type="button" data-val="oval">Oval</button><button type="button" data-val="cushion">Cushion</button>
+            </div></div>
+          <div class="field"><div class="top"><label for="carat">Carat weight</label><output id="carat-o" for="carat"></output></div>
+            <input type="range" id="carat" min="0.5" max="4" step="0.05"><span class="note" id="dims-note"></span></div>
+          <div class="field" id="ratio-f"><div class="top"><label for="ratio">Length to width</label><output id="ratio-o" for="ratio"></output></div>
+            <input type="range" id="ratio" min="1" max="1.8" step="0.01"></div>
+          <div class="field"><label for="stone">Stone</label>
+            <select id="stone"><option value="diamond">Diamond</option><option value="sapphire">Blue sapphire</option><option value="emerald">Emerald</option><option value="ruby">Ruby</option><option value="morganite">Morganite</option><option value="champagne">Champagne diamond</option></select></div>
+          <div class="field"><span class="lbl">Prongs</span>
+            <div class="seg" data-key="prongs" role="group" aria-label="Prongs"><button type="button" data-val="4">4 claw</button><button type="button" data-val="6">6 claw</button></div></div>
+        </fieldset>
+        <fieldset>
+          <legend>Setting</legend>
+          <div class="field"><span class="lbl">Cathedral arches</span>
+            <div class="seg" data-key="cathedral" role="group" aria-label="Cathedral"><button type="button" data-val="full">Full cathedral</button><button type="button" data-val="none">None</button></div></div>
+          <div class="field"><span class="lbl">Hidden halo</span>
+            <div class="seg" data-key="halo" role="group" aria-label="Hidden halo"><button type="button" data-val="off">Off</button><button type="button" data-val="half">Half</button><button type="button" data-val="full">Full</button></div></div>
+          <div class="field" id="perend-f"><div class="top"><label for="perend">Halo stones, front and back</label><output id="perend-o" for="perend"></output></div>
+            <input type="range" id="perend" min="1" max="6" step="1"></div>
+        </fieldset>
+        <fieldset>
+          <legend>Band</legend>
+          <div class="field"><span class="lbl">Metal</span>
+            <div class="seg" data-key="metal" role="group" aria-label="Metal">
+              <button type="button" data-val="yellow"><span class="dot" style="background:#e3b75b"></span>Yellow</button><button type="button" data-val="rose"><span class="dot" style="background:#e3a08a"></span>Rose</button><button type="button" data-val="white"><span class="dot" style="background:#d9d9d4"></span>White</button><button type="button" data-val="platinum"><span class="dot" style="background:#bfc3c8"></span>Platinum</button>
+            </div></div>
+          <div class="field"><div class="top"><label for="size">Ring size (US)</label><output id="size-o" for="size"></output></div>
+            <input type="range" id="size" min="3" max="10" step="0.25"></div>
+          <div class="field"><div class="top"><label for="width">Band width</label><output id="width-o" for="width"></output></div>
+            <input type="range" id="width" min="1.5" max="3" step="0.1"></div>
+          <div class="field"><div class="top"><label for="bands">Band stones, each side</label><output id="bands-o" for="bands"></output></div>
+            <input type="range" id="bands" min="0" max="18" step="1"><span class="note" id="fit-note" hidden></span></div>
+          <div class="field" id="sidestone-f"><span class="lbl">Small stones</span>
+            <div class="seg" data-key="sideStone" role="group" aria-label="Small stones"><button type="button" data-val="match">Match center</button><button type="button" data-val="diamond">Diamond</button></div></div>
+        </fieldset>
+        <fieldset>
+          <legend>Engraving</legend>
+          <div class="field"><label for="engrave">Text inside the band</label>
+            <input type="text" id="engrave" maxlength="16" autocomplete="off" placeholder="Leave empty for none"></div>
+          <div class="field"><span class="lbl">Lettering</span>
+            <div class="seg" data-key="font" role="group" aria-label="Lettering"><button type="button" data-val="serif">Serif italic</button><button type="button" data-val="script">Script</button><button type="button" data-val="block">Block</button></div></div>
+        </fieldset>
+      </form>
+
+      <aside class="ticket" aria-label="Current design">
+        <h2>NOTE</h2>
+        <hr class="rule">
+        <dl id="spec"></dl>
+        <div class="actions">
+          <button type="button" id="copy">Copy spec</button>
+          <button type="button" id="reset">Reset to order</button>
+        </div>
+        <div class="status" id="status" role="status"></div>
+      </aside>
+      <p class="fine">Stone sizes come from standard carat-to-millimeter estimates and vary by cut. This is a visual guide for the client, not a CAD file for casting.</p>
+    </div>
+  </div>
+</div>
+
+<script>window.__SAVED=null;</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(function(){
+const stage=document.getElementById('stage'), canvas=document.getElementById('c');
+function fail(){ const d=document.createElement('div'); d.className='err'; d.textContent='3D view needs WebGL, which this browser has turned off.'; stage.appendChild(d); }
+if(!window.THREE){ fail(); return; }
+let renderer; try{ renderer=new THREE.WebGLRenderer({canvas, antialias:true, alpha:true}); }catch(e){ fail(); return; }
+const V3=THREE.Vector3, UP=new V3(0,1,0);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setClearColor(0x000000,0);
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.05;
+const scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(30,1,0.5,600);
+
+/* ---------- design state ---------- */
+const ORDER={shape:'oval',carat:1.8,ratio:1.45,stone:'diamond',prongs:'4',cathedral:'full',halo:'half',perEnd:2,
+  metal:'yellow',size:4.75,width:2.0,bandStones:10,sideStone:'match',engrave:'A',font:'serif'};
+const KEY='ring-design-v1';
+let state={...ORDER};
+try{ const s=window.__SAVED; if(s&&typeof s==='object') state={...ORDER,...s}; }catch(e){}
+const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} };
+window.__getState=()=>state;
+
+const METALS={yellow:{name:'yellow gold',c:[1.0,0.74,0.34],r:0.16},rose:{name:'rose gold',c:[0.98,0.6,0.47],r:0.16},
+  white:{name:'white gold',c:[0.88,0.87,0.84],r:0.15},platinum:{name:'platinum',c:[0.76,0.77,0.79],r:0.2}};
+const STONES={diamond:{name:'diamond',t:[1,1,1],fire:1},sapphire:{name:'blue sapphire',t:[0.16,0.3,1.0],fire:0.25},
+  emerald:{name:'emerald',t:[0.14,0.82,0.4],fire:0.2},ruby:{name:'ruby',t:[1.0,0.08,0.16],fire:0.25},
+  morganite:{name:'morganite',t:[1.0,0.66,0.62],fire:0.35},champagne:{name:'champagne diamond',t:[1.0,0.78,0.5],fire:0.8}};
+const SHAPES={round:{name:'round',k:0.0061,n:2},oval:{name:'oval',k:0.0062,n:2},cushion:{name:'cushion',k:0.0080,n:3.2}};
+const FONTS={serif:'italic 600 PXpx "Bodoni Moda", Didot, Georgia, serif',script:'400 PXpx "Pinyon Script", "Snell Roundhand", cursive',block:'600 PXpx "IBM Plex Sans", Arial, sans-serif'};
+
+/* ---------- studio environment ---------- */
+const env=new THREE.Scene();
+{
+  const sg=new THREE.SphereGeometry(80,48,24), pa=sg.attributes.position, col=[];
+  for(let i=0;i<pa.count;i++){ const t=(pa.getY(i)/80+1)/2, v=0.025+0.32*Math.pow(t,2.4); col.push(v*0.97,v,v*1.05); }
+  sg.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+  env.add(new THREE.Mesh(sg,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide})));
+  const panel=(w,h,p,I,tint)=>{ tint=tint||[1,1,1];
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(tint[0]*I,tint[1]*I,tint[2]*I),side:THREE.DoubleSide}));
+    m.position.set(p[0],p[1],p[2]); m.lookAt(0,0,0); env.add(m); };
+  panel(46,34,[0,55,0],5); panel(10,60,[-55,8,14],3.2); panel(10,60,[55,8,-14],3.2);
+  panel(36,16,[0,14,55],2.2); panel(36,16,[0,14,-55],1.4);
+  panel(5,5,[24,44,26],22); panel(5,5,[-30,40,-18],20); panel(4,4,[36,26,-30],18,[1,.88,.7]);
+  panel(4,4,[-20,48,30],18,[.8,.9,1]); panel(6,3,[40,30,30],14); panel(3,6,[-42,26,24],14,[1,.9,.75]);
+  panel(8,2,[0,60,20],12); panel(2,8,[18,58,-10],12);
+}
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(env,0.02).texture;
+const cubeRT=new THREE.WebGLCubeRenderTarget(512,{type:THREE.HalfFloatType,generateMipmaps:false});
+new THREE.CubeCamera(0.1,200,cubeRT).update(renderer,env);
+
+/* ---------- materials ---------- */
+const metal=new THREE.MeshPhysicalMaterial({color:new THREE.Color(1,0.74,0.34),metalness:1,roughness:0.16,envMapIntensity:1.15});
+const engrMat=new THREE.MeshStandardMaterial({color:0x332210,metalness:0.7,roughness:0.55,transparent:true,depthWrite:false,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2});
+const gemVS=`varying vec3 vW; varying vec3 vO;
+  void main(){ vO=position; vec4 w=modelMatrix*vec4(position,1.0); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`;
+const gemFS=`uniform samplerCube uEnv; uniform vec3 uTint; uniform float uFire; varying vec3 vW; varying vec3 vO;
+  float gH2;
+  float hash(vec3 p){ return fract(sin(dot(p,vec3(12.9898,78.233,37.719)))*43758.5453); }
+  vec3 rotY(vec3 v,float a){ float c=cos(a),s=sin(a); return vec3(c*v.x+s*v.z,v.y,-s*v.x+c*v.z); }
+  vec3 inner(vec3 T,float a){ vec3 d=rotY(vec3(T.x,-T.y,T.z),a); d.y=abs(d.y)*(0.3+1.0*gH2)-0.08; return normalize(d); }
+  void main(){
+    vec3 N=normalize(cross(dFdx(vW),dFdy(vW)));
+    vec3 V=normalize(vW-cameraPosition);
+    if(dot(N,V)>0.0) N=-N;
+    vec3 No=normalize(cross(dFdx(vO),dFdy(vO)));
+    if(dot(No,vO)<0.0) No=-No;
+    vec3 key=floor(No*20.0+0.5);
+    float h=hash(key); gH2=hash(key+7.13);
+    float ci=clamp(dot(-V,N),0.0,1.0);
+    float F=0.17+0.83*pow(1.0-ci,5.0);
+    vec3 refl=textureCube(uEnv,reflect(V,N)).rgb*mix(vec3(1.0),uTint,0.3);
+    float a=h*6.2831;
+    vec3 c;
+    c.r=textureCube(uEnv,inner(refract(V,N,1.0/(2.42-0.09*uFire)),a)).r;
+    c.g=textureCube(uEnv,inner(refract(V,N,1.0/2.42),a)).g;
+    c.b=textureCube(uEnv,inner(refract(V,N,1.0/(2.42+0.11*uFire)),a)).b;
+    c*=(0.4+0.85*gH2)*uTint*mix(1.7,1.0,uFire);
+    gl_FragColor=vec4(mix(c,refl,F),1.0);
+    #include <tonemapping_fragment>
+    #include <encodings_fragment>
+  }`;
+const gemMat=()=>new THREE.ShaderMaterial({uniforms:{uEnv:{value:cubeRT.texture},uTint:{value:new THREE.Color(1,1,1)},uFire:{value:1}},extensions:{derivatives:true},vertexShader:gemVS,fragmentShader:gemFS});
+const centerMat=gemMat(), sideMat=gemMat();
+function setGem(m,key){ const s=STONES[key]; m.uniforms.uTint.value.setRGB(s.t[0],s.t[1],s.t[2]); m.uniforms.uFire.value=s.fire; }
+
+/* ---------- geometry helpers ---------- */
+function supe(phi,hu,hv,p){ const c=Math.cos(phi),s=Math.sin(phi); return [hu*Math.sign(c)*Math.pow(Math.abs(c),p),hv*Math.sign(s)*Math.pow(Math.abs(s),p)]; }
+function sweep(N,M,wrapU,fn){
+  const nu=wrapU?N:N+1,pos=[],ctr=[],idx=[];
+  for(let i=0;i<nu;i++) for(let j=0;j<M;j++){ const r=fn(i,j); pos.push(r.p[0],r.p[1],r.p[2]); ctr.push(r.c[0],r.c[1],r.c[2]); }
+  for(let i=0;i<N;i++){ const i1=wrapU?(i+1)%nu:i+1; for(let j=0;j<M;j++){ const j1=(j+1)%M,a=i*M+j,b=i1*M+j,c=i1*M+j1,d=i*M+j1; idx.push(a,b,d,b,c,d); } }
+  const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); g.setIndex(idx); g.computeVertexNormals();
+  const n=g.attributes.normal; let s=0;
+  for(let k=0;k<n.count;k+=7) s+=(pos[k*3]-ctr[k*3])*n.getX(k)+(pos[k*3+1]-ctr[k*3+1])*n.getY(k)+(pos[k*3+2]-ctr[k*3+2])*n.getZ(k);
+  if(s<0){ for(let k=0;k<idx.length;k+=3){ const t=idx[k+1]; idx[k+1]=idx[k+2]; idx[k+2]=t; } g.setIndex(idx); g.computeVertexNormals(); }
+  return g;
+}
+// brilliant cut, unit girdle (shaped by sf), girdle centered at y=0
+function brilliant(sf){
+  const yg=0.03,yt=yg+0.30,yc=-0.03-0.86,rt=0.56,P=[];
+  const pol=(r,a,y)=>{ const f=sf(a); return new V3(r*f*Math.cos(a),y,r*f*Math.sin(a)); };
+  const crownY=r=>yg+(yt-yg)*(1-r)/(1-rt), pavY=r=>yc+(-yg-yc)*r;
+  const C=[],S=[],G=[],Gb=[],Q=[];
+  for(let k=0;k<8;k++){ const a=k*Math.PI/4; C.push(pol(rt,a,yt)); S.push(pol(0.78,a+Math.PI/8,crownY(0.78))); Q.push(pol(0.24,a+Math.PI/8,pavY(0.24))); }
+  for(let j=0;j<16;j++){ const a=j*Math.PI/8; G.push(pol(1,a,yg)); Gb.push(pol(1,a,-yg)); }
+  const top=new V3(0,yt,0),cul=new V3(0,yc,0),ctr=new V3(0,-0.2,0);
+  const tri=(a,b,c)=>{ const n=new V3().subVectors(b,a).cross(new V3().subVectors(c,a)); const m=new V3().add(a).add(b).add(c).multiplyScalar(1/3).sub(ctr); if(n.dot(m)<0) P.push(a,c,b); else P.push(a,b,c); };
+  for(let k=0;k<8;k++){ const k1=(k+1)%8,km=(k+7)%8,g0=G[2*k],g1=G[2*k+1],g2=G[(2*k+2)%16];
+    tri(top,C[k],C[k1]); tri(C[k],C[k1],S[k]); tri(C[k],S[km],g0); tri(C[k],g0,S[k]); tri(S[k],g0,g1); tri(S[k],g1,g2);
+    tri(cul,Q[km],G[2*k]); tri(cul,G[2*k],Q[k]); tri(Q[k],Gb[2*k],Gb[2*k+1]); tri(Q[k],Gb[2*k+1],Gb[(2*k+2)%16]); }
+  for(let j=0;j<16;j++){ const j1=(j+1)%16; tri(G[j],G[j1],Gb[j]); tri(G[j1],Gb[j1],Gb[j]); }
+  const g=new THREE.BufferGeometry().setFromPoints(P); g.computeVertexNormals(); return g;
+}
+const roundGeo=brilliant(()=>1);
+
+/* ---------- contact shadow ---------- */
+const shadow=(()=>{ const c=document.createElement('canvas'); c.width=c.height=128; const x=c.getContext('2d');
+  const gr=x.createRadialGradient(64,64,0,64,64,64); gr.addColorStop(0,'rgba(0,0,0,0.75)'); gr.addColorStop(0.35,'rgba(0,0,0,0.35)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=gr; x.fillRect(0,0,128,128);
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(9,20),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false,toneMapped:false}));
+  m.rotation.x=-Math.PI/2; scene.add(m); return m; })();
+
+/* ---------- build the ring from state ---------- */
+const ring=new THREE.Group(); scene.add(ring);
+let dims={}, engrTex=null, centerGeo=null;
+function build(){
+  ring.traverse(o=>{ if(o.geometry && o.geometry!==roundGeo) o.geometry.dispose(); });
+  ring.clear(); if(engrTex){ engrTex.dispose(); engrTex=null; }
+  const s=state, sh=SHAPES[s.shape];
+  const RIN=(11.63+0.8128*s.size)/2, T=1.7, BW=s.width, RC=RIN+T/2, RO=RIN+T;
+  const ratio=s.shape==='round'?1:s.ratio;
+  const Wd=Math.cbrt(s.carat/(ratio*0.61*sh.k)), A=Wd/2, B=A*ratio;
+  const n=sh.n, sf=n===2?(()=>1):(a=>Math.pow(Math.pow(Math.abs(Math.cos(a)),n)+Math.pow(Math.abs(Math.sin(a)),n),-1/n));
+  const YG=RO+0.5+0.89*A, HY=YG-0.224*A, HK=0.86, LY=RO+0.27, LK=0.5;
+  const pr=Math.min(0.5,Math.max(0.3,0.25+0.045*A));
+  dims={RIN,RO,A,B,YG,top:YG+0.33*A,W:Wd,L:Wd*ratio};
+
+  const m=METALS[s.metal]; metal.color.setRGB(m.c[0],m.c[1],m.c[2]); metal.roughness=m.r;
+  engrMat.color.setRGB(m.c[0]*0.22,m.c[1]*0.22,m.c[2]*0.22);
+  setGem(centerMat,s.stone); setGem(sideMat,s.sideStone==='match'?s.stone:'diamond');
+  const add=(g,mat)=>{ const o=new THREE.Mesh(g,mat); ring.add(o); return o; };
+  const gem=(geo,mat,pos,dir,sx,sy,sz)=>{ const o=add(geo,mat); o.position.copy(pos); o.quaternion.setFromUnitVectors(UP,dir.clone().normalize()); o.scale.set(sx,sy??sx,sz??sx); return o; };
+
+  // shank
+  add(sweep(360,32,true,(i,j)=>{ const th=2*Math.PI*i/360,[dr,dz]=supe(2*Math.PI*j/32,T/2,BW/2,0.38),r=RC+dr;
+    return {p:[r*Math.cos(th),r*Math.sin(th),dz],c:[RC*Math.cos(th),RC*Math.sin(th),0]}; }),metal);
+
+  // shaped rail point + outward normal
+  const railPt=(k,a,y)=>{ const f=sf(a); return new V3(k*A*Math.cos(a)*f,y,k*B*Math.sin(a)*f); };
+  const railN=(k,a)=>{ const p1=railPt(k,a+1e-3,0),p0=railPt(k,a-1e-3,0),t=p1.sub(p0); const nn=new V3(t.z,0,-t.x).normalize(); const c=railPt(k,a,0); if(nn.dot(c)<0) nn.negate(); return nn; };
+  const rail=(k,y,hr,hy)=>add(sweep(240,20,true,(i,j)=>{ const a=2*Math.PI*i/240,c=railPt(k,a,y),nn=railN(k,a),[dr,dy]=supe(2*Math.PI*j/20,hr,hy,0.5);
+    return {p:[c.x+nn.x*dr,c.y+dy,c.z+nn.z*dr],c:[c.x,c.y,c.z]}; }),metal);
+  rail(HK,HY,0.27,0.48); rail(LK,LY,0.24,0.34);
+
+  // center stone
+  centerGeo=sh.n===2?roundGeo:brilliant(sf);
+  gem(centerGeo,centerMat,new V3(0,YG,0),UP,A,A,B);
+
+  // prongs
+  const pAng=s.prongs==='6'?[35,90,145,215,270,325]:[45,135,225,315];
+  const tipGeo=new THREE.SphereGeometry(pr,20,14), prongMid=[];
+  pAng.forEach(d=>{ const a=d*Math.PI/180, P=(k,y)=>railPt(k,a,y);
+    const tipY=YG+0.071*A+pr*0.95;
+    const cv=new THREE.CatmullRomCurve3([P(LK,LY),P(0.72,LY+0.45*(HY-LY)),P(0.9,HY),P(1.04,YG),P(1.03,YG+0.13*A+pr*0.3),P(0.94,tipY)]);
+    add(new THREE.TubeGeometry(cv,48,pr,14,false),metal);
+    const tip=add(tipGeo,metal); tip.position.copy(P(0.94,tipY)); prongMid.push(P(0.9,HY)); });
+
+  // cathedral arches
+  const AT=1.2, AW=BW*0.9; let arches=[];
+  if(s.cathedral==='full'){
+    const a0=48*Math.PI/180, P0=new V3(RC*Math.sin(a0),RC*Math.cos(a0),0), E=new V3(HK*A-0.15,HY-0.1,0), dx=P0.x-E.x, dy=E.y-P0.y;
+    arches=[1,-1].map(sg=>{ const f=v=>new V3(v.x*sg,v.y,0);
+      return new THREE.CubicBezierCurve3(f(P0),f(new V3(P0.x-0.05*dx,P0.y+0.45*dy,0)),f(new V3(E.x+0.45*dx,E.y-0.1*dy,0)),f(E)); });
+    arches.forEach(cv=>add(sweep(80,24,false,(i,j)=>{ const {c,n:nn}=frame(cv,i/80),[du,dz]=supe(2*Math.PI*j/24,AT/2,AW/2,0.45);
+      return {p:[c.x+nn.x*du,c.y+nn.y*du,dz],c:[c.x,c.y,0]}; }),metal));
+  }
+  function frame(cv,u){ const c=cv.getPointAt(u),t=cv.getTangentAt(u); const nn=new V3(t.y,-t.x,0).normalize(); if(nn.dot(c)<0) nn.negate(); return {c,n:nn}; }
+
+  // hidden halo stones
+  if(s.halo!=='off'){
+    const hd=Math.min(1.2,Math.max(0.8,0.3*A)), sp=hd*1.12, NS=720, pts=[], L=[0];
+    for(let i=0;i<=NS;i++) pts.push(railPt(HK,2*Math.PI*i/NS,HY));
+    for(let i=1;i<=NS;i++) L.push(L[i-1]+pts[i].distanceTo(pts[i-1]));
+    const per=L[NS];
+    const angAt=sx=>{ sx=((sx%per)+per)%per; let i=1; while(i<NS&&L[i]<sx) i++; const f=(sx-L[i-1])/(L[i]-L[i-1]); return 2*Math.PI*(i-1+f)/NS; };
+    let list=[];
+    if(s.halo==='full'){ const N=Math.floor(per/sp); for(let i=0;i<N;i++) list.push(L[NS/4]+i*per/N); }
+    else for(const tipIdx of [NS/4,3*NS/4]) for(let i=0;i<s.perEnd;i++) list.push(L[tipIdx]+(i-(s.perEnd-1)/2)*sp);
+    const hGeo=roundGeo;
+    list.forEach(sx=>{ const a=angAt(sx), c=railPt(HK,a,HY), nn=railN(HK,a), pos=c.clone().add(nn.clone().multiplyScalar(0.3));
+      if(prongMid.some(p=>p.distanceTo(pos)<pr+hd*0.45)) return;
+      const dir=nn.clone().multiplyScalar(Math.cos(0.42)).add(new V3(0,Math.sin(0.42),0));
+      gem(hGeo,sideMat,pos,dir,hd/2); });
+  }
+
+  // band stones
+  let placed=0;
+  if(s.bandStones>0){
+    const dia=Math.min(1.6,Math.max(0.9,BW*0.62)), pitch=dia*1.18, bz=Math.min(dia*0.51,BW/2-0.24);
+    const pts=[],nrm=[]; let a0;
+    if(arches.length){
+      for(let u=0.93;u>=0;u-=0.01){ const {c,n:nn}=frame(arches[0],u),p=c.clone().add(nn.clone().multiplyScalar(AT/2));
+        if(Math.hypot(p.x,p.y)<RO+0.03){ a0=Math.atan2(p.x,p.y); break; } pts.push(p); nrm.push(nn); }
+      if(a0===undefined) a0=0.9;
+    } else a0=Math.asin(Math.min(0.95,(LK*A+0.45+pr)/RO));
+    for(let a=a0;a<=Math.PI-0.06;a+=0.01){ pts.push(new V3(RO*Math.sin(a),RO*Math.cos(a),0)); nrm.push(new V3(Math.sin(a),Math.cos(a),0)); }
+    const L=[0]; for(let i=1;i<pts.length;i++) L.push(L[i-1]+pts[i].distanceTo(pts[i-1]));
+    const at=sx=>{ let i=1; while(i<L.length-1&&L[i]<sx) i++; const f=(sx-L[i-1])/(L[i]-L[i-1]); return {p:pts[i-1].clone().lerp(pts[i],f),n:nrm[i-1].clone().lerp(nrm[i],f).normalize()}; };
+    const s0=arches.length?dia*0.76:dia*0.6+0.1, total=L[L.length-1];
+    placed=Math.max(0,Math.min(s.bandStones,Math.floor((total-s0-dia*0.6)/pitch)+1));
+    const beadGeo=new THREE.SphereGeometry(Math.max(0.15,dia*0.155),12,10);
+    for(const sg of [1,-1]){
+      for(let k=0;k<placed;k++){ const {p,n:nn}=at(s0+k*pitch), P=new V3(p.x*sg,p.y,0), Nn=new V3(nn.x*sg,nn.y,0);
+        gem(roundGeo,sideMat,P.clone().add(Nn.clone().multiplyScalar(0.05)),Nn,dia/2); }
+      for(let k=-0.5;k<=placed-0.5+1e-6;k+=1){ const {p,n:nn}=at(s0+k*pitch), P=new V3(p.x*sg,p.y,0).add(new V3(nn.x*sg,nn.y,0).multiplyScalar(dia*0.13));
+        for(const z of [bz,-bz]){ const b=add(beadGeo,metal); b.position.set(P.x,P.y,z); } }
+    }
+  }
+  dims.placed=placed;
+
+  // engraving inside the bottom of the shank
+  dims.engrSpan=0.25;
+  const text=(s.engrave||'').trim();
+  if(text){
+    const ch=256, px=190, font=FONTS[s.font].replace('PX',px), cvs=document.createElement('canvas'), ctx=cvs.getContext('2d');
+    ctx.font=font; const tw=ctx.measureText(text).width;
+    const cw=Math.max(ch,Math.ceil(tw+70)); cvs.width=cw; cvs.height=ch;
+    ctx.fillStyle='#000'; ctx.fillRect(0,0,cw,ch); ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=font;
+    ctx.fillText(text,cw/2,ch/2+(s.font==='script'?6:12));
+    engrTex=new THREE.CanvasTexture(cvs); engrMat.alphaMap=engrTex; engrMat.needsUpdate=true;
+    let h=Math.min(1.3,BW*0.65), span=h*(cw/ch)/RIN; const maxSpan=1.5; if(span>maxSpan){ h*=maxSpan/span; span=maxSpan; }
+    dims.engrSpan=span;
+    const th0=-Math.PI/2-span/2, r=RIN-0.012, NU=Math.max(8,Math.ceil(span*60)), NV=4, pos=[], uv=[], idx=[];
+    for(let i=0;i<=NU;i++) for(let j=0;j<=NV;j++){ const u=i/NU,v=j/NV,th=th0+span*u,z=h/2-h*v; pos.push(r*Math.cos(th),r*Math.sin(th),z); uv.push(u,v); }
+    for(let i=0;i<NU;i++) for(let j=0;j<NV;j++){ const a=i*(NV+1)+j,b=a+NV+1; idx.push(a,b,a+1,b,b+1,a+1); }
+    const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2)); g.setIndex(idx); g.computeVertexNormals();
+    add(g,engrMat);
+  }
+  shadow.position.y=-RO-0.02; shadow.scale.set(BW/2+0.6,1,1);
+}
+
+/* ---------- camera + views ---------- */
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function view(name){ const mid=(dims.top-dims.RO)/2;
+  return {three:{th:0.7,ph:1.13,r:64,t:[0,mid,0]}, top:{th:0,ph:0.06,r:30+dims.A*5,t:[0,dims.YG-3,0]},
+    end:{th:0,ph:1.52,r:62,t:[0,mid,0]}, side:{th:Math.PI/2,ph:1.45,r:62,t:[0,mid,0]},
+    engr:{th:0,ph:0.74,r:22+dims.engrSpan*9,t:[0,-dims.RIN-0.55,0]}}[name]; }
+build();
+const v0=view('three'); const sph={th:v0.th,ph:v0.ph,r:v0.r}, target=new V3(...v0.t);
+let spin=!reduce, tw=null, dragging=false, curView='three';
+function place(){ const s=Math.sin(sph.ph); camera.position.set(target.x+sph.r*s*Math.sin(sph.th),target.y+sph.r*Math.cos(sph.ph),target.z+sph.r*s*Math.cos(sph.th)); camera.lookAt(target); }
+const ease=k=>k<0.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+function markView(name){ curView=name; document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===name))); }
+function goTo(name){ const v=view(name); let d=v.th-sph.th; d=((d+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
+  tw={f:{th:sph.th,ph:sph.ph,r:sph.r,t:target.clone()},to:{th:sph.th+d,ph:v.ph,r:v.r,t:new V3(...v.t)},t0:performance.now(),d:reduce?1:1000};
+  markView(name); if(name==='engr'||name==='top') setSpin(false); }
+function setSpin(on){ spin=on; document.getElementById('spin').setAttribute('aria-pressed',String(on)); }
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>goTo(b.dataset.view)));
+document.getElementById('spin').addEventListener('click',()=>setSpin(!spin));
+setSpin(spin);
+
+const ptrs=new Map(); let pinch0=0,r0=0;
+canvas.addEventListener('pointerdown',e=>{ canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY}); tw=null; dragging=true;
+  if(ptrs.size===2){ const [a,b]=[...ptrs.values()]; pinch0=Math.hypot(a.x-b.x,a.y-b.y); r0=sph.r; } });
+canvas.addEventListener('pointermove',e=>{ if(!ptrs.has(e.pointerId)) return; const p=ptrs.get(e.pointerId),dx=e.clientX-p.x,dy=e.clientY-p.y; p.x=e.clientX; p.y=e.clientY;
+  if(ptrs.size===1){ sph.th-=dx*0.008; sph.ph=Math.min(2.5,Math.max(0.04,sph.ph-dy*0.008)); if(Math.abs(dx)+Math.abs(dy)>2&&curView) markView(''); }
+  else if(ptrs.size===2){ const [a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y); if(pinch0>0) sph.r=Math.min(130,Math.max(14,r0*pinch0/d)); } });
+const up=e=>{ ptrs.delete(e.pointerId); if(ptrs.size===0) dragging=false; };
+canvas.addEventListener('pointerup',up); canvas.addEventListener('pointercancel',up);
+canvas.addEventListener('wheel',e=>{ e.preventDefault(); tw=null; sph.r=Math.min(130,Math.max(14,sph.r*Math.exp(e.deltaY*0.0012))); },{passive:false});
+function resize(){ const w=stage.clientWidth,h=stage.clientHeight; if(!w||!h) return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.fov=w/h<0.9?40:30; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+let last=performance.now();
+function loop(now){ const dt=Math.min(0.05,(now-last)/1000); last=now;
+  if(tw){ const k=Math.min(1,(now-tw.t0)/tw.d),e=ease(k);
+    sph.th=tw.f.th+(tw.to.th-tw.f.th)*e; sph.ph=tw.f.ph+(tw.to.ph-tw.f.ph)*e; sph.r=tw.f.r+(tw.to.r-tw.f.r)*e; target.lerpVectors(tw.f.t,tw.to.t,e); if(k>=1) tw=null; }
+  else if(spin&&!dragging) sph.th+=dt*0.32;
+  place(); renderer.render(scene,camera); requestAnimationFrame(loop); }
+place(); requestAnimationFrame(loop);
+
+/* ---------- controls ---------- */
+const $=id=>document.getElementById(id);
+const frac=v=>{ const w=Math.floor(v),f=Math.round((v-w)*4); return w+(['','¼','½','¾'][f]||''); };
+const fracTxt=v=>{ const w=Math.floor(v),f=Math.round((v-w)*4); return w+(['',' 1/4',' 1/2',' 3/4'][f]||''); };
+const ranges={carat:'carat',ratio:'ratio',perend:'perEnd',size:'size',width:'width',bands:'bandStones'};
+let pending=false;
+function schedule(){ if(pending) return; pending=true; requestAnimationFrame(()=>{ pending=false; build(); refresh(); save();
+  if(curView&&!tw&&!dragging){ const v=view(curView); target.set(...v.t); } }); }
+function syncControls(){
+  document.querySelectorAll('.seg[data-key]').forEach(g=>g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(String(state[g.dataset.key])===b.dataset.val))));
+  for(const id in ranges) $(id).value=state[ranges[id]];
+  $('stone').value=state.stone; $('engrave').value=state.engrave;
+}
+function refresh(){
+  const s=state, ID=(11.63+0.8128*s.size);
+  $('carat-o').textContent=s.carat.toFixed(2)+' ct';
+  $('ratio-o').textContent=(s.shape==='round'?1:s.ratio).toFixed(2);
+  $('perend-o').textContent=s.perEnd; $('size-o').textContent=frac(s.size)+' · '+ID.toFixed(1)+' mm';
+  $('width-o').textContent=s.width.toFixed(1)+' mm'; $('bands-o').textContent=s.bandStones;
+  $('dims-note').textContent='About '+dims.L.toFixed(1)+' × '+dims.W.toFixed(1)+' mm';
+  $('ratio-f').hidden=s.shape==='round'; $('perend-f').hidden=s.halo!=='half';
+  $('sidestone-f').hidden=s.stone==='diamond';
+  const fit=$('fit-note'); fit.hidden=!(s.bandStones>dims.placed); fit.textContent='Only '+dims.placed+' fit at this band width and size.';
+  $('scale-tag').textContent='US '+frac(s.size)+' · '+ID.toFixed(1)+' mm ID';
+  const shapeCap=SHAPES[s.shape].name;
+  $('headline').innerHTML=shapeCap[0].toUpperCase()+shapeCap.slice(1)+(s.cathedral==='full'?' cathedral':' solitaire')+', <em>'+(+s.carat.toFixed(2))+' ct</em>';
+  const rows=specRows(), dl=$('spec'); dl.textContent='';
+  rows.forEach(r=>{ const dt=document.createElement('dt'); dt.textContent=r[0]; const dd=document.createElement('dd'); dd.textContent=r[1]; if(r[3]){ const ed=document.createElement('span'); ed.className='ed'; ed.textContent='edited'; dd.appendChild(ed); }
+    if(r[2]){ const sp=document.createElement('span'); sp.className='sub'; sp.textContent=r[2]; dd.appendChild(sp); } dl.append(dt,dd); });
+}
+function haloTxt(s){ return s.halo==='off'?'None':s.halo==='full'?'Full hidden halo':'Half hidden halo'; }
+function specRows(){ const s=state,o=ORDER;
+  const sideNote=s.stone!=='diamond'?(s.sideStone==='match'?'small stones match center':'small stones diamond'):'';
+  return [
+    ['Size',frac(s.size),'≈ '+(11.63+0.8128*s.size).toFixed(1)+' mm inside diameter',s.size!==o.size],
+    ['Band',s.width.toFixed(1).replace('.0','')+' mm '+METALS[s.metal].name,'',s.width!==o.width||s.metal!==o.metal],
+    ['Setting',s.cathedral==='full'?'Full cathedral':'No cathedral',s.prongs+' claw prongs',s.cathedral!==o.cathedral],
+    ['Center',(+s.carat.toFixed(2))+' ct '+SHAPES[s.shape].name+' '+STONES[s.stone].name,'≈ '+dims.L.toFixed(1)+' × '+dims.W.toFixed(1)+' mm',s.carat!==o.carat||s.shape!==o.shape||s.stone!==o.stone],
+    ['Halo',haloTxt(s),s.halo==='half'?s.perEnd+' stone'+(s.perEnd>1?'s':'')+' front, '+s.perEnd+' back':'',s.halo!==o.halo||(s.halo==='half'&&s.perEnd!==o.perEnd)],
+    ['Band',dims.placed+' stones each side',sideNote,dims.placed!==o.bandStones||(s.stone!=='diamond'&&s.sideStone!=='match')],
+    ['Engrave',s.engrave.trim()?'“'+s.engrave.trim()+'”':'None',s.engrave.trim()?{serif:'serif italic',script:'script',block:'block letters'}[s.font]+', inside the shank':'',s.engrave.trim()!==o.engrave||(s.engrave.trim()&&s.font!==o.font)]
+  ]; }
+function specText(){ const s=state, L=[];
+  L.push('Band Size '+fracTxt(s.size)); L.push(s.width.toFixed(1).replace('.0','')+'mm '+METALS[s.metal].name);
+  L.push(s.cathedral==='full'?'Full Cathedral':'No cathedral');
+  if(s.halo==='half') L.push('half hidden halo, '+s.perEnd+' stone'+(s.perEnd>1?'s':'')+' front and back'); else if(s.halo==='full') L.push('full hidden halo');
+  L.push(SHAPES[s.shape].name+' '+(+s.carat.toFixed(2))+' ct '+STONES[s.stone].name+' (~'+dims.L.toFixed(1)+' x '+dims.W.toFixed(1)+' mm'+(s.shape!=='round'?', '+s.ratio.toFixed(2)+' L:W':'')+')');
+  L.push(s.prongs+' claw prongs');
+  if(dims.placed) L.push(dims.placed+' stones on the band, each side'+(s.stone!=='diamond'?(s.sideStone==='match'?' ('+STONES[s.stone].name+')':' (diamond)'):''));
+  if(s.engrave.trim()) L.push('', 'Engrave "'+s.engrave.trim()+'" ('+{serif:'serif italic',script:'script',block:'block'}[s.font]+')');
+  return L.join('\n'); }
+
+document.querySelectorAll('.seg[data-key]').forEach(g=>g.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
+  state[g.dataset.key]=b.dataset.val; syncControls(); schedule(); }));
+for(const id in ranges) $(id).addEventListener('input',e=>{ state[ranges[id]]=parseFloat(e.target.value); schedule(); });
+$('stone').addEventListener('change',e=>{ state.stone=e.target.value; schedule(); });
+$('engrave').addEventListener('input',e=>{ state.engrave=e.target.value; schedule(); });
+$('engrave').addEventListener('focus',()=>{ if(curView!=='engr') goTo('engr'); });
+document.querySelector('[data-key="font"]').addEventListener('click',()=>{ if(curView!=='engr') goTo('engr'); });
+$('reset').addEventListener('click',()=>{ state={...ORDER}; syncControls(); schedule(); status('Reset to the original order.'); });
+$('copy').addEventListener('click',()=>{ const t=specText();
+  navigator.clipboard.writeText(t).then(()=>status('Spec copied.'),()=>status('Copy is blocked here. Select the ticket text to copy it.')); });
+let stT; function status(m){ $('status').textContent=m; clearTimeout(stT); stT=setTimeout(()=>$('status').textContent='',3500); }
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>schedule());
+syncControls(); refresh();
+})();
+</script>
+
+</body></html>

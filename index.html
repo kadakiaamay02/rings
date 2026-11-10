@@ -1,0 +1,62 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Ring Renders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a jeweler's tray card per client, two up on desktop, stacked on phones. */
+:root{
+  --bg:#e9ecea; --surface:#f7f8f7; --ink:#172022; --muted:#58656a; --line:#cdd5d4;
+  --rose:#b5674c; --gold:#8a5e10;
+  --f-display:"Bodoni Moda", Didot, Georgia, serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1112; --surface:#151b1c; --ink:#e4eaeb; --muted:#94a2a6; --line:#273133;
+  --rose:#e59a80; --gold:#e0b45c; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0d1112; --surface:#151b1c; --ink:#e4eaeb; --muted:#94a2a6; --line:#273133;
+  --rose:#e59a80; --gold:#e0b45c; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:48px 48px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:500;font-size:clamp(30px,5vw,48px);line-height:1.05;margin:6px 0 0;text-wrap:balance}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+a.card{display:flex;flex-direction:column;gap:10px;min-width:0;padding:22px;border:1px solid var(--line);border-radius:6px;
+  background:var(--surface);color:inherit;text-decoration:none;transition:border-color .15s, transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+a.card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.card.amay{--accent:var(--rose)} .card.shivani{--accent:var(--gold)}
+.who{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.card h2{font-family:var(--f-display);font-weight:500;font-size:26px;line-height:1.1;margin:0}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.route{margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);font-family:var(--f-mono);font-size:13px;display:flex;justify-content:space-between}
+@media (prefers-reduced-motion: reduce){ a.card{transition:none} a.card:hover{transform:none} }
+</style>
+<style>body{margin:0}</style></head><body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Custom ring renders</div>
+    <h1>Two rings, ready to spin</h1>
+  </header>
+  <nav class="grid" aria-label="Rings">
+    <a class="card amay" href="amay/">
+      <span class="who">Amay</span>
+      <h2>Channel-set band</h2>
+      <p>Flat rose-gold band with a channel-set green baguette. Change the metal, finish, stones and engraving.</p>
+      <span class="route"><span>Open Amay's ring</span><span aria-hidden="true">→</span></span>
+    </a>
+    <a class="card shivani" href="shivani/">
+      <span class="who">Shivani</span>
+      <h2>Oval cathedral, 1.8 ct</h2>
+      <p>Yellow-gold cathedral setting with a hidden halo and band stones. Change the stone, setting, size and engraving.</p>
+      <span class="route"><span>Open Shivani's ring</span><span aria-hidden="true">→</span></span>
+    </a>
+  </nav>
+</div>
+</body></html>
