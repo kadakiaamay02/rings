@@ -236,7 +236,8 @@ function loadSaved(){
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 const state = Object.assign({}, DEFAULTS, loadSaved());
-window.__getState=()=>state;
+window.__getState=()=>{ const {spin, ...rest} = state; return rest; };
+window.__ringObject=()=>ringGroup;
 
 const $ = id => document.getElementById(id);
 const innerDiameter = s => 11.63 + 0.8128*s;   // US size to inner diameter in mm
@@ -608,6 +609,8 @@ $('reset').addEventListener('click', ()=>{
   sync(); rebuild(true); setView('three');
 });
 
+window.__applyState = s => { window.__SAVED = s; Object.assign(state, DEFAULTS, loadSaved(), {spin: state.spin}); sync(); rebuild(true); };
+
 /* ---------- Start ---------- */
 sync();
 rebuild('init');
@@ -619,4 +622,5 @@ if(document.fonts && document.fonts.load){
 })();
 </script>
 
+<script src="../save.js" data-spec="amay/spec.json" data-name="amay-ring"></script>
 </body></html>

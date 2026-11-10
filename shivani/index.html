@@ -198,7 +198,8 @@ const KEY='ring-design-v1';
 let state={...ORDER};
 try{ const s=window.__SAVED; if(s&&typeof s==='object') state={...ORDER,...s}; }catch(e){}
 const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} };
-window.__getState=()=>state;
+window.__getState=()=>({...state});
+window.__ringObject=()=>ring;
 
 const METALS={yellow:{name:'yellow gold',c:[1.0,0.74,0.34],r:0.16},rose:{name:'rose gold',c:[0.98,0.6,0.47],r:0.16},
   white:{name:'white gold',c:[0.88,0.87,0.84],r:0.15},platinum:{name:'platinum',c:[0.76,0.77,0.79],r:0.2}};
@@ -522,9 +523,11 @@ $('reset').addEventListener('click',()=>{ state={...ORDER}; syncControls(); sche
 $('copy').addEventListener('click',()=>{ const t=specText();
   navigator.clipboard.writeText(t).then(()=>status('Spec copied.'),()=>status('Copy is blocked here. Select the ticket text to copy it.')); });
 let stT; function status(m){ $('status').textContent=m; clearTimeout(stT); stT=setTimeout(()=>$('status').textContent='',3500); }
+window.__applyState=s=>{ if(s&&typeof s==='object'){ state={...ORDER,...s}; syncControls(); schedule(); } };
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>schedule());
 syncControls(); refresh();
 })();
 </script>
 
+<script src="../save.js" data-spec="shivani/spec.json" data-name="shivani-ring"></script>
 </body></html>
