@@ -1,0 +1,18 @@
+{
+  "shape": "oval",
+  "carat": 2.9,
+  "ratio": 1.23,
+  "stone": "diamond",
+  "prongs": "4",
+  "cathedral": "none",
+  "peek": "off",
+  "halo": "off",
+  "perEnd": 2,
+  "metal": "yellow",
+  "size": 4.75,
+  "width": 2,
+  "bandStones": 10,
+  "sideStone": "match",
+  "engrave": "A",
+  "font": "serif"
+}
