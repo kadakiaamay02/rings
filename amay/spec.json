@@ -1,13 +1,13 @@
 {
   "metal": "yellow",
-  "finish": "satin",
+  "finish": "polished",
   "profile": "flat",
-  "width": 6,
+  "width": 5,
   "thick": 2,
-  "size": 10,
+  "size": 9,
   "stone": "diamond",
   "count": 1,
-  "bag": 1.6,
+  "bag": 2,
   "engrave": "",
   "engraveStyle": "script"
 }
