@@ -1,10 +1,10 @@
 {
   "shape": "oval",
-  "carat": 2.9,
+  "carat": 1.2,
   "ratio": 1.23,
   "stone": "diamond",
   "prongs": "4",
-  "cathedral": "none",
+  "cathedral": "full",
   "peek": "off",
   "halo": "off",
   "perEnd": 2,
